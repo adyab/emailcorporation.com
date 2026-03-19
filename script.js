@@ -1,84 +1,94 @@
-(function() {
-    // 1. Counter Animation
-    const counterEl = document.getElementById('addressCount');
-    if (counterEl) {
-        let count = 612384;
-        setInterval(() => {
-            const change = Math.floor(Math.random() * 5) - 1; // -1 to +3
-            count += change;
-            counterEl.textContent = count.toLocaleString();
-        }, 3000);
-    }
-
-    // 2. Testimonial Carousel
-    const testimonials = [
-        {
-            text: "&ldquo;We have been using The Email Corporation for some time. Our emails arrive.&rdquo;",
-            attr: "&mdash; Director of Communications, Meridian Group"
-        },
-        {
-            text: "&ldquo;The vagueness of their service description was initially a concern, but the results are consistent.&rdquo;",
-            attr: "&mdash; Compliance Officer, Consolidated Associates LLC"
-        },
-        {
-            text: "&ldquo;They handle our signal routing. We do not ask how.&rdquo;",
-            attr: "&mdash; Operations Lead, The Foundry"
-        }
-    ];
-
-    let currentTestimonial = 0;
-    const testimonialText = document.getElementById('testimonialText');
-    const nextBtn = document.getElementById('nextTestimonial');
-
-    if (testimonialText && nextBtn) {
-        nextBtn.addEventListener('click', () => {
-            currentTestimonial = (currentTestimonial + 1) % testimonials.length;
-            testimonialText.style.opacity = 0;
-            setTimeout(() => {
-                testimonialText.innerHTML = `
-                    ${testimonials[currentTestimonial].text}
-                    <div class="testimonial-attr">${testimonials[currentTestimonial].attr}</div>
-                `;
-                testimonialText.style.opacity = 1;
-            }, 200);
-        });
-    }
-
-    // 3. Fake Form Handling
-    const form = document.getElementById('contactForm');
-    const statusEl = document.getElementById('formStatus');
-
-    if (form && statusEl) {
-        const responses = [
-            'Your inquiry has been received and logged. A member of our team will assess whether a response is appropriate within a standard timeframe.',
-            'Thank you for your submission. It has been assigned a reference number that we are not able to share with you at this time.',
-            'Your request has been forwarded to the appropriate department. The appropriate department has been notified of its receipt.',
-            'We have noted your interest in email services. Your inquiry is currently under review by a reviewer.',
-            'Submission confirmed. You may not receive a follow-up communication, but your submission has nonetheless been recorded.'
-        ];
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const confirmBox = document.getElementById('confirmNothing');
-            const orgField = document.getElementById('orgName');
-
-            if (!confirmBox || !confirmBox.checked) {
-                statusEl.textContent = 'Please confirm that you understand nothing immediate will happen.';
-                return;
-            }
-
-            const base = responses[Math.floor(Math.random() * responses.length)];
-            const org = orgField && orgField.value.trim() ? orgField.value.trim() : "your organization";
-
-            statusEl.textContent = base + " In most cases, " + org + " will continue operating as before.";
-            form.reset();
-        });
-    }
-
-    // 4. Footer Year
-    const yearEl = document.getElementById('footerYear');
+// Year in footer
+document.addEventListener("DOMContentLoaded", () => {
+    const yearEl = document.getElementById("year");
     if (yearEl) {
         yearEl.textContent = new Date().getFullYear();
     }
-})();
+
+    animateRollingNumber();
+    setupTestimonialCycler();
+    setupAccessForm();
+});
+
+function animateRollingNumber() {
+    const el = document.querySelector(".rolling-number");
+    if (!el) return;
+
+    const target = parseInt(el.dataset.target || "0", 10);
+    const duration = 2600;
+    const start = performance.now();
+
+    function frame(now) {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        const value = Math.floor(target * eased);
+        el.textContent = value.toString().padStart(6, "0");
+        if (t < 1) requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
+}
+
+function setupTestimonialCycler() {
+    const testimonials = [
+        {
+            text: "“The Email Corporation allowed us to centralize our email responsibilities without changing who actually reads the emails.”",
+            meta: "Head of Something Approximating Operations\nRegional Client (Name Deferred)"
+        },
+        {
+            text: "“We used to track our email. Now we know that it is being tracked for us, somewhere, by someone.”",
+            meta: "Interim Lead, Communications‑Adjacent Function\nConfidential Client"
+        },
+        {
+            text: "“Our teams stopped asking where an email came from and started assuming it was intentional. This has simplified a number of conversations.”",
+            meta: "Executive Responsible For Outcomes\nLong‑Term Participant Organization"
+        }
+    ];
+
+    const textEl = document.getElementById("testimonial-text");
+    const metaEl = document.getElementById("testimonial-meta");
+    const button = document.getElementById("cycle-testimonial");
+
+    if (!textEl || !metaEl || !button) return;
+
+    let index = 0;
+
+    button.addEventListener("click", () => {
+        index = (index + 1) % testimonials.length;
+        const t = testimonials[index];
+        textEl.textContent = t.text;
+        metaEl.textContent = t.meta;
+    });
+}
+
+function setupAccessForm() {
+    const form = document.getElementById("access-form");
+    const statusEl = document.getElementById("form-status");
+
+    if (!form || !statusEl) return;
+
+    const responses = [
+        "Your indication of interest has been noted by the appropriate systems.",
+        "Thank you. No immediate follow‑up is required on your part.",
+        "Preliminary evaluation has begun. If action becomes necessary, you may become aware of it.",
+        "Submission received. This does not constitute an agreement, but it does acknowledge a possibility."
+    ];
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const checkbox = document.getElementById("confirm-understanding");
+        const orgField = document.getElementById("org-name");
+
+        if (checkbox && !checkbox.checked) {
+            statusEl.textContent = "Please confirm that you understand nothing immediate will happen.";
+            return;
+        }
+
+        const base = responses[Math.floor(Math.random() * responses.length)];
+        const org = orgField && orgField.value.trim() ? orgField.value.trim() : "your organization";
+
+        statusEl.textContent = base + " In most cases, " + org + " will continue operating as before.";
+        form.reset();
+    });
+}
