@@ -5,28 +5,15 @@ document.addEventListener("DOMContentLoaded", () => {
         yearEl.textContent = new Date().getFullYear();
     }
 
-    animateRollingNumber();
+    setStaticAddressCount();
     setupTestimonialCycler();
     setupAccessForm();
 });
 
-function animateRollingNumber() {
+function setStaticAddressCount() {
     const el = document.querySelector(".rolling-number");
     if (!el) return;
-
-    const target = parseInt(el.dataset.target || "0", 10);
-    const duration = 2600;
-    const start = performance.now();
-
-    function frame(now) {
-        const t = Math.min(1, (now - start) / duration);
-        const eased = 1 - Math.pow(1 - t, 3);
-        const value = Math.floor(target * eased);
-        el.textContent = value.toString().padStart(6, "0");
-        if (t < 1) requestAnimationFrame(frame);
-    }
-
-    requestAnimationFrame(frame);
+    el.textContent = "1,000,000+";
 }
 
 function setupTestimonialCycler() {
